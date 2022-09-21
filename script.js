@@ -79,6 +79,7 @@ function reset(){
   document.getElementById("guessed").value = "";
   document.getElementById("next").style.visibility = "collapse";
   document.getElementById("stop").style.visibility = ""
+  document.getElementById("start").style.visibility = ""
 }
 
 function stop(){
@@ -113,6 +114,7 @@ document.getElementById("stop").addEventListener("click", (e) =>{
 });
 
 document.getElementById("start").addEventListener("click", (e) => {
+  e.target.style.visibility = "collapse";
   slider = 5
   start();
 });
