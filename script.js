@@ -1,9 +1,8 @@
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
-let slider = document.getElementById("slider");
-let sliderLabel = document.getElementById("sliderLabel");
 
 let img = new Image();
+let slider = 5;
 let interval = 0.0005;
 let allMovies = shuffle(data);
 let allMovieTitles = allMovies.map(e => e.title);
@@ -39,7 +38,7 @@ function pixelate(){
   // canvas.height = img.height;
   // canvas.width = img.width;
 
-  let size = slider.value * interval;
+  let size = slider * interval;
   let w = canvas.width * size;
   let h = canvas.height * size;
   ctx.drawImage(img, 0, 0, w, h);
@@ -55,12 +54,12 @@ document.getElementById("guess").addEventListener("submit", (e) => {
 });
 
 function guess(e){
-  let guess = document.getElementById("guessed").value;
-  console.log("Guess: " + guess);
-  console.log("Title: " + randomMovie.title);
-  if(guess == randomMovie.title){
+  let guess = document.getElementById("guessed");
+  if(guess.value == randomMovie.title){
     alert("YEP");
     show();
+    document.getElementById("next").style.visibility = "";
+    document.getElementById("stop").style.visibility = "collapse"
   }
   else {
     alert("NOPE")
@@ -69,15 +68,36 @@ function guess(e){
 
 function show(){
   clearInterval(i);
-  slider.value = 140;
+  slider = 140;
   interval = 0.00705;
   pixelate();
 }
 
 function reset(){
-  slider.value = 5;
+  slider = 5;
   interval = 0.0005;
   document.getElementById("guessed").value = "";
+  document.getElementById("next").style.visibility = "collapse";
+  document.getElementById("stop").style.visibility = ""
+}
+
+function stop(){
+  clearInterval(i);
+}
+
+function unpause(){
+  start();
+}
+
+function start(){
+  i = setInterval(() => {
+    pixelate();
+    if(slider >= 140) {
+      clearInterval(i);
+    }
+    slider++;
+    interval += 0.00005
+  }, 100);
 }
 
 document.getElementById("next").addEventListener("click", (e) => {
@@ -86,29 +106,15 @@ document.getElementById("next").addEventListener("click", (e) => {
   draw(randomMovie.poster);
 });
 
-document.getElementById("slider").addEventListener("change", (e) => {
-  document.getElementById("sliderValue").innerText = e.target.value
-});
 let i = null;
 
 document.getElementById("stop").addEventListener("click", (e) =>{
-  clearInterval(i);
-  interval = 0.001;
-  slider.value = 5;
+  stop();
 });
 
 document.getElementById("start").addEventListener("click", (e) => {
-  slider.value = 5
-
-  i = setInterval(() => {
-    pixelate();
-    if(slider.value >= 140) {
-      clearInterval(i);
-    }
-    slider.value++;
-    sliderLabel.innerText = slider.value;
-    interval += 0.00005
-  }, 100);
+  slider = 5
+  start();
 });
 
 //###################
@@ -116,6 +122,14 @@ function autocomplete(inp, arr) {
   var currentFocus;
   inp.addEventListener("input", function(e) {
       var a, b, i, val = this.value;
+
+      if(val.trim() != ""){
+        stop();
+      }
+      else {
+        unpause();
+      }
+
       closeAllLists();
       if (!val) { return false;}
       currentFocus = -1;
